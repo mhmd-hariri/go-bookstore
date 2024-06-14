@@ -9,11 +9,23 @@ import (
 )
 
 var (
-	db *gorm.DB
+	db           *gorm.DB
+	Port         int
+	User         string
+	Password     string
+	DatabaseName string
 )
 
+func init() {
+	// initilize global variable
+	Port = 9010
+	User = "root"
+	Password = "root"
+	DatabaseName = "book_store"
+}
+
 func Connect() {
-	d, err := gorm.Open("mysql", "root:root@/book_store?charset=utf8&parseTime=True&loc=Local")
+	d, err := gorm.Open("mysql", fmt.Sprintf("%s:%s@/%s?charset=utf8&parseTime=True&loc=Local", User, Password, DatabaseName))
 	if err != nil {
 		fmt.Println(err)
 		panic(err)
