@@ -5,8 +5,6 @@ import (
 	"github.com/mhmd-hariri/go-bookstore/pkg/config"
 )
 
-var db *gorm.DB
-
 type Book struct {
 	gorm.Model
 	Name        string `gorm:"" json:"name"`
@@ -15,29 +13,28 @@ type Book struct {
 }
 
 func init() {
-	config.Connect()
-	db = config.GetDB()
-	db.AutoMigrate(&Book{})
-}
-func (b *Book) CreateBook() *Book {
 
-	db.NewRecord(b)
-	db.Create(&b)
+	config.DB.AutoMigrate(&Book{})
+}
+
+func (b *Book) CreateBook() *Book {
+	config.DB.NewRecord(b)
+	config.DB.Create(&b)
 	return b
 }
 
 func GetAllbooks() []Book {
 	var books []Book
-	db.Find(&books)
+	config.DB.Find(&books)
 	return books
 }
 func GetBookById(Id int64) (*Book, *gorm.DB) {
 	var book Book
-	db.Where("ID=?", Id).Find(&book)
-	return &book, db
+	config.DB.Where("ID=?", Id).Find(&book)
+	return &book, config.DB
 }
 func DeleteBook(Id int64) Book {
 	var book Book
-	db.Where("ID=?", Id).Delete(&book)
+	config.DB.Where("ID=?", Id).Delete(&book)
 	return book
 }

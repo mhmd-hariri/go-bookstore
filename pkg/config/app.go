@@ -1,19 +1,22 @@
 package config
 
 import (
+	"crypto/rand"
+	"encoding/base64"
 	"fmt"
+	"log"
 
 	_ "github.com/go-sql-driver/mysql"
-
 	"github.com/jinzhu/gorm"
 )
 
 var (
-	db           *gorm.DB
+	DB           *gorm.DB
 	Port         int
 	User         string
 	Password     string
 	DatabaseName string
+	JwtKey       []byte
 )
 
 func init() {
@@ -22,17 +25,19 @@ func init() {
 	User = "root"
 	Password = "root"
 	DatabaseName = "book_store"
-}
-
-func Connect() {
-	d, err := gorm.Open("mysql", fmt.Sprintf("%s:%s@/%s?charset=utf8&parseTime=True&loc=Local", User, Password, DatabaseName))
+	var err error
+	DB, err = gorm.Open("mysql", fmt.Sprintf("%s:%s@/%s?charset=utf8&parseTime=True&loc=Local", User, Password, DatabaseName))
 	if err != nil {
-		fmt.Println(err)
-		panic(err)
+		log.Fatal(err)
 	}
-	db = d
-}
+	log.Println("Database connection established")
 
-func GetDB() *gorm.DB {
-	return db
+	b := make([]byte, 32)
+	_, err = rand.Read(b)
+	if err != nil {
+		fmt.Println("Error", err)
+		return
+	}
+	secretKey := base64.URLEncoding.EncodeToString(b)
+	JwtKey = []byte(secretKey)
 }
